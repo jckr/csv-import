@@ -2,6 +2,7 @@ import {guessHeaderNames} from './detect-headers';
 
 type Value = string | number | null;
 export type Header = {
+
   name: string;
   nullable: boolean;
   type: 'string' | 'number' | 'null' | 'unknown';
