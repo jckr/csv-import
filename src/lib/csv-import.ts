@@ -1,5 +1,8 @@
+import {guessHeaderNames} from './detect-headers';
+
 type Value = string | number | null;
-type Header = {
+export type Header = {
+
   name: string;
   nullable: boolean;
   type: 'string' | 'number' | 'null' | 'unknown';
@@ -11,9 +14,12 @@ type csv = {
 }
 
 export const csvImport = (raw: string): csv => {
+  const rows = raw.split('\n');
+  if (rows.length === 0) {throw('The file is empty');}
+  const headers = guessHeaderNames(rows.slice(0, 5));
 
   return {
     data: [] as Value[][],
-    headers: [] as Header[],
+    headers,
   };
 }
