@@ -49,11 +49,7 @@ const FILE_WITH_ONE_COLUMN = `id
 2
 3`.split('\n');
 
-const headers = [
-  { name: 'id', nullable: false, type: 'unknown' },
-  { name: 'name', nullable: false, type: 'unknown' },
-  { name: 'age', nullable: false, type: 'unknown' },
-];
+const headers = ['id', 'name', 'age'];
 
 describe('it finds the correct separator in a csv file', () => {
   it('detects comma separator', () => {
