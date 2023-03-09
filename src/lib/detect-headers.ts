@@ -7,7 +7,9 @@ export function splitWithSeparator(line: string, separator: string): string[] {
     `(".*?"|[^"${separator}\s]+)(?=\s*${separator}|\s*$)`,
     'g'
   );
-  return line.match(regex) || [];
+  const removeQuotesAndTrim = (s: string) => s.trim().replace(/^"(.*)"$/, '$1').trim();
+
+  return (line.match(regex) || []).map(removeQuotesAndTrim);
 }
 
 export function guessSeparator(firstLines: string[]) {
@@ -42,8 +44,8 @@ export function guessSeparator(firstLines: string[]) {
   return ',';
 }
 
-export function guessHeaderNames(firstLines: string[]) {
-  const separator = guessSeparator(firstLines);
+export function guessHeaderNames(firstLines: string[], s?: string ) {
+  const separator = s || guessSeparator(firstLines);
   const headerNames = splitWithSeparator(firstLines[0], separator).map(headerName => {
     const headerNameWithoutSpace = headerName.trim();
     if (headerNameWithoutSpace.startsWith('"') && headerNameWithoutSpace.endsWith('"')) {
@@ -51,5 +53,5 @@ export function guessHeaderNames(firstLines: string[]) {
     }
     return headerNameWithoutSpace;
   });
-  return headerNames.map(name => ({name, nullable: false, type: 'unknown'} as Header));
+  return headerNames;
 }

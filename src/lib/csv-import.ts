@@ -1,11 +1,14 @@
-import {guessHeaderNames} from './detect-headers';
+import { buildData } from './build-data';
+import {guessHeaderNames, guessSeparator, splitWithSeparator} from './detect-headers';
+import { inferData } from './infer-data';
 
-type Value = string | number | null;
+export type Value = string | number | boolean | null;
+export type CsvType = 'TEXT' | 'DATE' | 'DATETIME' | 'TIMESTAMP' | 'SMALLINT' | 'INTEGER' | 'BIGINT' | 'REAL' | 'TINYINT' | 'BOOLEAN';
 export type Header = {
 
   name: string;
   nullable: boolean;
-  type: 'string' | 'number' | 'null' | 'unknown';
+  type: CsvType;
 }
 
 type csv = {
@@ -16,10 +19,20 @@ type csv = {
 export const csvImport = (raw: string): csv => {
   const rows = raw.split('\n');
   if (rows.length === 0) {throw('The file is empty');}
-  const headers = guessHeaderNames(rows.slice(0, 5));
+  const first5Rows = rows.slice(0, 5);
+  const separator = guessSeparator(first5Rows)
+  const headersNames = guessHeaderNames(first5Rows, separator);
+  const headers = [] as Header[];
+  const dataRows = rows.slice(1).map(row => splitWithSeparator(row, separator));
+  for (let i = 0; i < headers.length; i++) {
+    const {nullable, type} = inferData(dataRows, i);
+    headers.push({name: headersNames[i], nullable, type});
+  }
+
+  const data = buildData(dataRows, headers);
 
   return {
-    data: [] as Value[][],
+    data,
     headers,
   };
 }
